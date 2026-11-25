@@ -22,8 +22,15 @@ import * as zlibMod from 'node:zlib';
 const ROUTE_SESSIONS = '/qq-monitor/sessions';
 const ROUTE_TRANSCRIPT = '/qq-monitor/transcript';
 const ROUTE_HEALTH = '/qq-monitor/health';
+const ROUTE_MODULES = '/qq-monitor/modules';
 /** 端口探测超时（设计稿约束：500ms） */
 const PORT_PROBE_TIMEOUT_MS = 500;
+/** 模块卡片目录（设计稿【卡片注册机制】） */
+const MODULES_DIR = resolve(homedir(), '.dsh-qqbot', 'panel');
+/** 单卡片文件大小上限（8KB） */
+const MODULE_FILE_MAX_BYTES = 8192;
+/** 卡片过期阈值（10 分钟） */
+const MODULE_STALE_MS = 10 * 60_000;
 const MAX_TAIL_EVENTS = 400;
 const MAX_TEXT_CHARS = 4000;
 
@@ -542,6 +549,81 @@ async function handleHealth(req, res) {
   }
 }
 
+/**
+ * 模块卡片（设计稿【卡片注册机制】）：
+ * 扫描 ~/.dsh-qqbot/panel/*.json，每文件一张卡；
+ * 限 8KB，解析失败跳过并记录，字段缺失降级，不含文件路径。
+ */
+const MODULE_STATUSES = new Set(['ok', 'warn', 'error', 'idle', 'off']);
+
+function strOr(v, max = 120) {
+  return typeof v === 'string' ? v.slice(0, max) : undefined;
+}
+
+function sanitizeCard(raw, fileName) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const id = strOr(raw.id ?? fileName.replace(/\.json$/i, ''), 64);
+  if (!id) return null;
+  const status = MODULE_STATUSES.has(raw.status) ? raw.status : 'idle';
+  const rows = Array.isArray(raw.rows)
+    ? raw.rows.slice(0, 8).map(r => ({
+        label: strOr(r?.label, 40),
+        value: strOr(r?.value, 120),
+      })).filter(r => r.label !== undefined && r.value !== undefined)
+    : [];
+  const spark = Array.isArray(raw.spark)
+    ? raw.spark.filter(n => typeof n === 'number' && Number.isFinite(n)).slice(-60)
+    : [];
+  return {
+    id,
+    title: strOr(raw.title, 40) ?? id,
+    icon: strOr(raw.icon, 8),
+    status,
+    headline: strOr(raw.headline, 120),
+    rows,
+    spark,
+    updatedAt: typeof raw.updatedAt === 'number' ? raw.updatedAt : undefined,
+    stale: typeof raw.updatedAt === 'number' ? (Date.now() - raw.updatedAt) > MODULE_STALE_MS : false,
+  };
+}
+
+function collectModules() {
+  const out = [];
+  let entries;
+  try { entries = readdirSync(MODULES_DIR, { withFileTypes: true }); } catch {
+    return { modules: out, dirExists: false };
+  }
+  for (const e of entries) {
+    if (!e.isFile() || !e.name.toLowerCase().endsWith('.json')) continue;
+    try {
+      const p = join(MODULES_DIR, e.name);
+      const size = statSync(p).size;
+      if (size > MODULE_FILE_MAX_BYTES) {
+        console.warn(`[qq-monitor] module card skipped (oversized ${size}B): ${e.name}`);
+        continue;
+      }
+      const raw = JSON.parse(readFileSync(p, 'utf8').replace(/^\uFEFF/, ''));
+      const card = sanitizeCard(raw, e.name);
+      if (card) out.push(card);
+      else console.warn(`[qq-monitor] module card skipped (invalid shape): ${e.name}`);
+    } catch (err) {
+      console.warn(`[qq-monitor] module card skipped (parse failed: ${String(err?.message ?? err).slice(0, 120)}): ${e.name}`);
+    }
+  }
+  out.sort((a, b) => a.id.localeCompare(b.id));
+  return { modules: out, dirExists: true };
+}
+
+function handleModules(req, res) {
+  if (!isAllowed(req)) return sendJson(res, 403, { error: 'forbidden' });
+  try {
+    const { modules } = collectModules();
+    sendJson(res, 200, { modules, generatedAt: Date.now() });
+  } catch (err) {
+    sendJson(res, 500, { error: String(err?.message ?? err) });
+  }
+}
+
 /** 宿主插件入口 */
 export function apply(ctx) {
   const cleanups = [];
@@ -569,6 +651,11 @@ export function apply(ctx) {
         kind: 'exact',
         path: ROUTE_HEALTH,
         handler: (req, res) => { void handleHealth(req, res); },
+      }),
+      webServer.register({
+        kind: 'exact',
+        path: ROUTE_MODULES,
+        handler: (req, res) => { handleModules(req, res); },
       }),
     ];
     return () => { for (const d of disposers) d(); };

@@ -10,6 +10,50 @@ AstrBot 风格的对话镜像窗口，实时显示 `@tencent-connect/dsh-qqbot` 
 3. 左列是 QQ 会话清单（来自 `~/.dsh-qqbot/model-prefs.json` 的映射），
    点一个会话，右列显示对话气泡，每 3 秒自动刷新（页面不可见时暂停）。
 
+## 标签页（总览 / 对话 / 统计）
+
+头部下方标签栏，用 URL hash（`#overview` / `#chat` / `#stats`）记住当前页，刷新保持。
+标签定义是可注册数组（`TABS`），后续新功能按 `{ id, label, render }` 追加即可。
+
+### 总览页
+
+1. 顶部沿用状态条（四卡片健康看板）；
+2. **「此刻在做什么」由会话最后事件推导，不依赖模型自述**：
+   `user/message` → 思考中；`tool/call` → 正在使用 <工具名>（持续秒数）；
+   `assistant/message` → 空闲（距今时间）。工具名映射表 `TOOL_CN` 是常量，便于扩展；
+3. **今日时间线**：0–24 点横轴，竖线标事件（蓝=用户 绿=机器人 黄=工具），悬停显示时间，纯 SVG；
+4. **模块卡片网格**：渲染 `~/.dsh-qqbot/panel/*.json` 注册的外部卡片。
+
+### 统计页（全部由 transcript 前端聚合，零外联）
+
+- 近 14 天每日消息数折线（SVG）；
+- 回复耗时：用户消息 → 机器人下一条回复的时间差，中位数与 P90（窗口 10 分钟内）；
+- 工具调用次数排行（前 8，条形图）。
+
+## 模块卡片注册（外部功能接入点）
+
+任何插件/脚本写一个 JSON 文件到 `~/.dsh-qqbot/panel/<id>.json` 即可在总览页出现卡片：
+
+```json
+{
+  "id": "bili-duty",
+  "title": "B站值守",
+  "icon": "📺",
+  "status": "ok",
+  "headline": "上一轮看了 2 个视频",
+  "rows": [{ "label": "今日已看", "value": "14 个视频" }],
+  "spark": [2, 5, 3, 8],
+  "updatedAt": 1795576904603
+}
+```
+
+- 单文件限 8KB；解析失败/形状错误跳过并记录，不影响整页；
+- `status` ∈ ok | warn | error | idle | off（缺失降级 idle）；
+- `updatedAt` 超过 10 分钟：卡片置灰显示「数据已过期」；
+- 所有文本字段以 React 文本节点渲染（textContent 级），**无 innerHTML**，模型输出无法注入脚本；
+- 数据不含文件完整路径；沿用 loopback / 同源围栏，面板只读。
+- 注意：Windows 记事本保存的 UTF-8 文件带 BOM，插件已兼容（读取时剥离）。
+
 ## 数据流
 
 - Client（`client.js`）：侧栏图标 + keyed `main` 主面板，同源 fetch 取数；
@@ -76,16 +120,21 @@ AstrBot 风格的对话镜像窗口，实时显示 `@tencent-connect/dsh-qqbot` 
 
 ## 已验证
 
-- 路由数据：sessions（清单+预览）、transcript（400 气泡+标题）、health（size/mtime/lastRole/webPort ok+latency）全部 200 正确（2026-11-24）；
-- 同源围栏：无 Origin 200 / 同源 200 / 跨站 403 / 非 loopback 403 / unknown id 403（三条路由一致）；
+- 路由数据：sessions / transcript / health / **modules** 四条路由 200 正确（2026-11-25）；
+- modules：sanitize 三例（非字符串滤除、坏 status 降级 idle、spark 过滤非数字）、
+  stale 标记（15 分钟前 → true）、UTF-8 BOM 兼容、超限/坏文件跳过不崩溃；
 - 判定逻辑五态冒烟：assistant→idle、user 10s→ok、tool 50s→warn、tool 120s 双静止→stuck、tool 120s 但 mtime 新→warn（不误报）；
+- 列表解析六场景冒烟：普通/转义号(1\.)/全角号(1。)/顿号/跨空行续排/起始序号；
+- 注入过滤冒烟：15 种前缀识别 + toUnits 分组（sysline/msg 交错正确）；
+- deriveNow 三态 + computeStats 聚合冒烟；
+- 同源围栏四态 + unknown id 403（四条路由一致）；
 - 转写缓存回归：mtime+size 未变时同引用命中；
 - 插件条目 `include:qq-monitor` active。
 
 ## 未验证
 
-- 状态条与折线图的实际渲染效果（本会话无浏览器控制）；前端判定已冒烟，视觉呈现（配色/折线形状/收起动画）需要页面上确认；
-- 看板娘挪位与状态表情（规划中，尚未实现）。
+- 标签页切换、总览页时间线、统计页图表的实际渲染效果（本会话无浏览器控制）；
+- 模块卡片的浏览器端 stale 置灰呈现。
 
 ## 气泡类型映射
 

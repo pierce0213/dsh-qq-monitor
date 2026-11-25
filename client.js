@@ -145,8 +145,12 @@
   overflow-wrap: break-word; white-space: normal; }
 .qm-bubble.bot { align-self: flex-start; background: var(--qm-bot-bubble);
   border-radius: 4px 16px 16px 16px; color: var(--qm-text); width: fit-content; max-width: 100%; }
-.qm-bubble.user { background: var(--qm-user-bubble); color: var(--qm-user-text);
+/* 设计稿 5：用户气泡固定 #4D6BFE 白字（不随主题 token 漂移）；机器人 #F3F4F7 浅灰 */
+.qm-bubble.user { background: #4d6bfe; color: #ffffff;
   border-radius: 16px 4px 16px 16px; }
+@media (prefers-color-scheme: dark) {
+  .qm-bubble.bot { background: var(--dsw-alias-bg-layer-2, #23262d); }
+}
 /* 新消息淡入（设计稿 7）；prefers-reduced-motion 下关闭（设计稿 8） */
 .qm-row.fresh, .qm-tool.fresh { animation: qm-fade ${NEW_FADE_MS}ms ease-out; }
 @keyframes qm-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
@@ -192,24 +196,27 @@
 @media (max-width: 900px) { .qm-health-cardbox { grid-template-columns: repeat(2, 1fr); } }
 .qm-hcard { position: relative; background: var(--qm-bg-subtle); border-radius: 10px;
   padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.qm-hcard.warn { background: #fff8e6; }
-.qm-hcard.stuck { background: #fff0f0; }
-@media (prefers-color-scheme: dark) {
-  .qm-hcard.warn { background: #2b2415; }
-  .qm-hcard.stuck { background: #2e1d1f; }
-}
-.qm-hdot { position: absolute; top: 10px; right: 12px; width: 8px; height: 8px; border-radius: 50%;
-  background: #9aa0a8; }
+/* 设计稿 2：状态圆点在标题左侧（不再放右上角）；标题行 flex 对齐 */
+.qm-hdot { width: 8px; height: 8px; border-radius: 50%;
+  background: #9aa0a8; flex: none; }
 .qm-hdot.ok { background: #22a06b; }
 .qm-hdot.warn { background: #e8a317; }
 .qm-hdot.stuck { background: #e5484d; }
-.qm-hcard-title { font-size: 12px; color: var(--qm-muted); }
+.qm-hcard-title { font-size: 12px; color: var(--qm-muted); display: flex; align-items: center; gap: 6px; }
 .qm-hcard-value { font-size: 18px; font-weight: 700; line-height: 1.3; color: var(--qm-text);
   display: flex; align-items: center; gap: 8px; min-width: 0; }
 .qm-hcard-sub { font-size: 12px; color: var(--qm-muted); overflow: hidden;
   text-overflow: ellipsis; white-space: nowrap; }
 .qm-spark { display: block; flex: none; }
 .qm-face { flex: none; }
+/* 注入元数据灰字行（第1轮-1）与开关行 */
+.qm-sysline { font-size: 11px; color: var(--qm-muted); opacity: .75; padding: 2px 46px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; box-sizing: border-box; }
+.qm-sysline-toggle { display: flex; justify-content: center; margin: 0 0 8px; }
+.qm-sysline-toggle button { border: none; background: transparent; color: var(--qm-muted);
+  font: inherit; font-size: 11px; cursor: pointer; padding: 2px 10px; border-radius: 999px; }
+.qm-sysline-toggle button:hover { background: var(--qm-bg-subtle); }
+.qm-sysline-toggle button:focus-visible { outline: 2px solid var(--qm-accent); outline-offset: 1px; }
 /* 工具调用折叠条（设计稿 4） */
 .qm-tool { align-self: flex-start; margin: 0 0 4px 42px; font-size: 13px; box-sizing: border-box;
   max-width: 75%; background: var(--qm-tool-bg); border-left: 2px solid var(--qm-accent);
@@ -236,6 +243,50 @@
 .qm-error { color: var(--dsw-alias-state-error-primary, #d64545); font-size: 12px;
   padding: 8px clamp(16px, 3vw, 40px); flex: none; }
 .qm-rail-icon { display: block; color: currentColor; }
+/* 标签页（第2轮） */
+.qm-tabs { display: flex; gap: 4px; padding: 8px clamp(16px, 3vw, 40px) 0; border-bottom: 1px solid var(--qm-line); flex: none; }
+.qm-tab { border: none; background: transparent; color: var(--qm-muted); font: inherit; font-size: 13px;
+  cursor: pointer; padding: 6px 16px; border-radius: 8px 8px 0 0; position: relative; }
+.qm-tab:hover { background: var(--qm-bg-subtle); color: var(--qm-text); }
+.qm-tab.active { color: var(--qm-accent); font-weight: 600; }
+.qm-tab.active::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px;
+  background: var(--qm-accent); border-radius: 1px; }
+.qm-tab:focus-visible { outline: 2px solid var(--qm-accent); outline-offset: -2px; }
+/* 总览页：此刻卡片 + 时间线 */
+.qm-now { display: flex; align-items: center; gap: 14px; margin: 14px clamp(16px, 3vw, 40px) 0;
+  padding: 14px 18px; background: var(--qm-bg-subtle); border-radius: 12px; }
+.qm-now-doing { font-size: 17px; font-weight: 600; }
+.qm-now-sub { font-size: 12px; color: var(--qm-muted); }
+.qm-timeline-wrap { margin: 14px clamp(16px, 3vw, 40px); }
+.qm-timeline-title { font-size: 12px; color: var(--qm-muted); margin-bottom: 8px; }
+.qm-timeline { display: block; width: 100%; }
+/* 模块卡片网格 */
+.qm-modgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
+  margin: 14px clamp(16px, 3vw, 40px) 20px; }
+.qm-mod { background: var(--qm-bg-subtle); border-radius: 10px; padding: 12px 14px; min-width: 0;
+  display: flex; flex-direction: column; gap: 6px; }
+.qm-mod.off, .qm-mod.stale { opacity: .55; }
+.qm-mod-top { display: flex; align-items: center; gap: 8px; }
+.qm-mod-title { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; }
+.qm-mod-headline { font-size: 12px; color: var(--qm-text); }
+.qm-mod-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+.qm-mod-label { color: var(--qm-muted); flex: none; }
+.qm-mod-value { color: var(--qm-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qm-mod-empty { grid-column: 1 / -1; }
+/* 统计页 */
+.qm-stats { margin: 14px clamp(16px, 3vw, 40px); display: flex; flex-direction: column; gap: 18px; }
+.qm-stat-card { background: var(--qm-bg-subtle); border-radius: 10px; padding: 12px 16px; }
+.qm-stat-title { font-size: 12px; color: var(--qm-muted); margin-bottom: 8px; }
+.qm-stat-chart { display: block; width: 100%; }
+.qm-stat-num { font-size: 18px; font-weight: 700; color: var(--qm-text); }
+.qm-stat-sub { font-size: 12px; color: var(--qm-muted); margin-top: 2px; }
+.qm-rank-row { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 4px 0; }
+.qm-rank-name { width: 130px; color: var(--qm-text); overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; flex: none; }
+.qm-rank-bar-track { flex: 1; height: 8px; background: var(--qm-bg); border-radius: 4px; overflow: hidden; }
+.qm-rank-bar { height: 100%; background: var(--qm-accent); border-radius: 4px; }
+.qm-rank-count { width: 44px; text-align: right; color: var(--qm-muted); flex: none; }
 /* 设计稿 8：减少动态 */
 @media (prefers-reduced-motion: reduce) {
   .qm-row.fresh, .qm-tool.fresh { animation: none; }
@@ -301,21 +352,25 @@
           }
           if (fence) { flushPara(); flushList(); code = { lang: fence[1] || '', lines: [] }; continue; }
           const t = line.trim();
-          if (!t) { flushPara(); flushList(); continue; }
+          // 空行不打断列表：列表项之间允许空行（序号延续），仅段落结束
+          if (!t) { flushPara(); continue; }
           const hm = /^(#{1,3})\s+(.*)$/.exec(t);
           if (hm) { flushPara(); flushList(); out.push({ kind: 'h', level: hm[1].length, text: hm[2] }); continue; }
           const ul = /^[-*•]\s+(.*)$/.exec(t);
-          const ol = /^(\d+)[.、)]\s+(.*)$/.exec(t);
+          // 序号变体：1. / 1、 / 1) / 1。以及 markdown 转义号 1\.（bot 常输出）；
+          // start 记录首个序号值，跨空行合并同一列表避免序号重排
+          const ol = /^(?:(\d+)[\\]?[.、。)]|(\d+)。)\s*(.*)$/.exec(t);
           if (ul) {
             flushPara();
-            if (!list || list.ordered) { flushList(); list = { kind: 'list', ordered: false, items: [] }; }
+            if (!list || list.ordered) { flushList(); list = { kind: 'list', ordered: false, start: 1, items: [] }; }
             list.items.push(ul[1]);
             continue;
           }
           if (ol) {
             flushPara();
-            if (!list || !list.ordered) { flushList(); list = { kind: 'list', ordered: true, items: [] }; }
-            list.items.push(ol[2]);
+            const value = Number(ol[1] ?? ol[2]);
+            if (!list || !list.ordered) { flushList(); list = { kind: 'list', ordered: true, start: value || 1, items: [] }; }
+            list.items.push(ol[3]);
             continue;
           }
           flushList();
@@ -338,7 +393,9 @@
           }
           if (b.kind === 'list') {
             const items = b.items.map((it, j) => h('li', { key: `${k}-${j}` }, parseInline(it, `${k}-${j}`)));
-            return b.ordered ? h('ol', { key: k }, items) : h('ul', { key: k }, items);
+            return b.ordered
+              ? h('ol', { key: k, start: b.start ?? 1 }, items)
+              : h('ul', { key: k }, items);
           }
           if (b.kind === 'code') return h(CodeBlock, { key: k, lang: b.lang, text: b.text, keyBase: k });
           return null;
@@ -346,6 +403,33 @@
       }
 
       /* ── 展示辅助 ── */
+      /* ── 注入元数据过滤（第1轮-1）──
+       * Harness 注入的系统消息（时间采样/时区/运行时上下文等）默认隐藏；
+       * 开关打开后以灰色小字一行展示（不用气泡） */
+      const INJECTED_PREFIXES = [
+        'Time sampled while preparing',
+        'Elapsed since the',
+        'Browser time zone',
+        'Current runtime context',
+        'Current working directory',
+        'Current DSH file policy',
+        'Current DeepSeek Harness',
+        'Approval prompts are',
+        '<system-reminder>',
+        '<available_skills>',
+        '<skill_content>',
+        '<system>',
+        '[Request interrupted',
+        '<environment_context>',
+        '<runtime_context>',
+      ];
+
+      function isInjectedMeta(text) {
+        const s = String(text ?? '').trimStart();
+        if (!s) return false;
+        return INJECTED_PREFIXES.some(p => s.startsWith(p));
+      }
+
       function timeOf(at) {
         if (typeof at !== 'number' || !Number.isFinite(at)) return '';
         const d = new Date(at);
@@ -440,7 +524,7 @@
             ))));
       }
 
-      /** 把事件流折叠为渲染单元：连续工具调用合并为一组（设计稿 4） */
+      /** 把事件流折叠为渲染单元：注入元数据降级为 sysline（第1轮-1），连续工具调用合并为组（设计稿 4） */
       function toUnits(events) {
         const units = [];
         for (const ev of events) {
@@ -451,6 +535,12 @@
             continue;
           }
           if (ev.type !== 'user' && ev.type !== 'assistant') continue;
+          if (ev.type === 'user' && isInjectedMeta(ev.text)) {
+            const last = units[units.length - 1];
+            if (last && last.kind === 'sysline') last.group.push(ev);
+            else units.push({ kind: 'sysline', group: [ev] });
+            continue;
+          }
           units.push({ kind: 'msg', ev });
         }
         return units;
@@ -519,24 +609,22 @@
             ...eyes, mouth));
       }
 
-      /** 80×24 迷你折线：polyline + 最新点圆点（设计稿 4） */
+      /** 80×24 迷你折线：polyline + 最新点圆点；采样 <5 点时显示灰色"收集中…"（设计稿 3） */
       function Sparkline({ points }) {
         const W = 80;
         const H = 24;
-        if (!points || points.length < 2) {
-          return h('svg', { className: 'qm-spark', width: W, height: H, 'aria-hidden': true },
-            h('line', { x1: 0, y1: H - 2, x2: W, y2: H - 2, stroke: 'var(--qm-accent)', 'stroke-opacity': .35, 'stroke-width': 2 }));
+        if (!points || points.length < 5) {
+          return h('span', { style: { fontSize: 11, color: 'var(--qm-muted)', lineHeight: `${H}px` } }, '收集中…');
         }
         const max = Math.max(...points);
         const min = Math.min(...points);
         const span = Math.max(max - min, 1);
         const step = W / (points.length - 1);
         const pts = points.map((v, i) => `${(i * step).toFixed(1)},${(H - 3 - ((v - min) / span) * (H - 6)).toFixed(1)}`).join(' ');
-        const lastX = W;
         const lastY = H - 3 - ((points[points.length - 1] - min) / span) * (H - 6);
         return h('svg', { className: 'qm-spark', width: W, height: H, 'aria-hidden': true },
           h('polyline', { points: pts, fill: 'none', stroke: 'var(--qm-accent)', 'stroke-width': 2, 'stroke-linejoin': 'round' }),
-          h('circle', { cx: lastX - 0.5, cy: lastY.toFixed(1), r: 2.5, fill: 'var(--qm-accent)' }));
+          h('circle', { cx: W - 0.5, cy: lastY.toFixed(1), r: 2.5, fill: 'var(--qm-accent)' }));
       }
 
       /** 状态条整体：折叠态单行摘要 / 展开态 4 卡片；疑似卡住自动展开 + 顶部红条 */
@@ -599,10 +687,11 @@
           folded
             ? h('div', { className: 'qm-health-summary' }, summaryBits.join(' · '))
             : h('div', { className: 'qm-health-cardbox' },
-                // 卡片一：最后心跳
+                // 卡片一：最后心跳（圆点在标题左侧）
                 h('div', { className: `qm-hcard${verdict.level === 'warn' ? ' warn' : ''}${stuck ? ' stuck' : ''}` },
-                  h('span', { className: `qm-hdot ${verdict.level === 'idle' ? '' : verdict.level}` }),
-                  h('span', { className: 'qm-hcard-title' }, '最后心跳'),
+                  h('span', { className: 'qm-hcard-title' },
+                    h('span', { className: `qm-hdot ${verdict.level === 'idle' ? '' : verdict.level}` }),
+                    '最后心跳'),
                   h('span', { className: 'qm-hcard-value' },
                     StatusFace({ level: verdict.level }),
                     ageText ?? (verdict.level === 'idle' ? '待机' : '—')),
@@ -612,16 +701,18 @@
                       : `${verdict.label} · 基准 ${timeOf(health?.session?.lastEventAt) || '—'}`)),
                 // 卡片二：会话文件
                 h('div', { className: 'qm-hcard' },
-                  h('span', { className: `qm-hdot ${typeof size === 'number' ? 'ok' : ''}` }),
-                  h('span', { className: 'qm-hcard-title' }, '会话文件'),
+                  h('span', { className: 'qm-hcard-title' },
+                    h('span', { className: `qm-hdot ${typeof size === 'number' ? 'ok' : ''}` }),
+                    '会话文件'),
                   h('span', { className: 'qm-hcard-value' },
                     Sparkline({ points }),
                     typeof size === 'number' ? fmtBytes(size) : '—'),
                   h('span', { className: 'qm-hcard-sub' }, deltaText)),
                 // 卡片三：Web 端口
                 h('div', { className: `qm-hcard${webOk ? '' : ' stuck'}` },
-                  h('span', { className: `qm-hdot ${webOk ? 'ok' : 'stuck'}` }),
-                  h('span', { className: 'qm-hcard-title' }, 'Web 端口'),
+                  h('span', { className: 'qm-hcard-title' },
+                    h('span', { className: `qm-hdot ${webOk ? 'ok' : 'stuck'}` }),
+                    'Web 端口'),
                   h('span', { className: 'qm-hcard-value' }, port?.port ?? '—'),
                   h('span', { className: 'qm-hcard-sub' }, webSub)),
                 // 卡片四：视觉路由
@@ -629,8 +720,9 @@
                   const vr = health?.visionRouter;
                   const vrStale = vr?.exists && typeof vr.mtime === 'number' && (Date.now() - vr.mtime) > VISION_STALE_MS;
                   return h('div', { className: 'qm-hcard' },
-                    h('span', { className: `qm-hdot ${vr?.exists ? (vrStale ? 'warn' : 'ok') : ''}` }),
-                    h('span', { className: 'qm-hcard-title' }, '视觉路由'),
+                    h('span', { className: 'qm-hcard-title' },
+                      h('span', { className: `qm-hdot ${vr?.exists ? (vrStale ? 'warn' : 'ok') : ''}` }),
+                      '视觉路由'),
                     h('span', { className: 'qm-hcard-value' }, vr?.exists ? '运行中' : '未启用'),
                     h('span', { className: 'qm-hcard-sub' }, vr?.exists ? `日志 ${relTime(vr.mtime)}更新` : '无 vision-router 日志'));
                 })(),
@@ -639,6 +731,168 @@
 
       function lastTime(health) {
         return health?.session?.lastEventAt;
+      }
+
+      /* ── 总览页（第2轮）── */
+      /** 工具名 → 中文映射（便于扩展的常量表） */
+      const TOOL_CN = {
+        pwsh: '执行命令',
+        read: '读取文件',
+        write: '写入文件',
+        edit: '编辑文件',
+        glob: '查找文件',
+        grep: '搜索内容',
+        web_search: '搜索网页',
+        web_fetch: '抓取网页',
+        read_image: '查看图片',
+        send_meme: '挑表情包',
+        comfyui_workflow: '生成图片',
+        todo_write: '整理清单',
+        send_message: '发消息',
+        schedule_create: '建提醒',
+      };
+      const toolCn = name => TOOL_CN[name] ?? name ?? '工具';
+
+      /**
+       * 「此刻在做什么」：由最后事件推导，不依赖模型自述（第2轮总览 2）。
+       * user/message → 思考中；tool/call → 正在使用 <工具>（持续秒数）；
+       * assistant/message → 空闲（距今时间）。
+       */
+      function deriveNow(events, baseNow) {
+        const arr = events ?? [];
+        for (let i = arr.length - 1; i >= 0; i--) {
+          const ev = arr[i];
+          if (ev.type === 'user') {
+            return { doing: '思考中', sub: `主人 ${relTime(ev.at)} 发来消息`, level: 'busy', at: ev.at };
+          }
+          if (ev.type === 'tool') {
+            const since = typeof ev.at === 'number' ? Math.max(0, baseNow - ev.at) : 0;
+            return { doing: `正在使用 ${toolCn(ev.name)}`, sub: `已持续 ${fmtDuration(since)}`, level: 'busy', at: ev.at };
+          }
+          if (ev.type === 'assistant') {
+            return { doing: '空闲', sub: typeof ev.at === 'number' ? `上一条回复 ${relTime(ev.at)}` : '', level: 'idle', at: ev.at };
+          }
+        }
+        return { doing: '暂无活动', sub: '', level: 'idle', at: null };
+      }
+
+      /** 今日时间线：0–24 点横轴 + 事件竖线（纯 SVG，第2轮总览 3） */
+      const TL_COLORS = { user: '#4d6bfe', assistant: '#22a06b', tool: '#e8a317' };
+      function TodayTimeline({ events }) {
+        const W = 760;
+        const H = 64;
+        const pad = 8;
+        const today = dayKeyOf(Date.now());
+        const items = (events ?? []).filter(ev =>
+          (ev.type === 'user' || ev.type === 'assistant' || ev.type === 'tool')
+          && dayKeyOf(ev.at) === today && typeof ev.at === 'number');
+        const axisY = H - 16;
+        const xOf = at => {
+          const d = new Date(at);
+          const frac = (d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds()) / 86400;
+          return pad + frac * (W - pad * 2);
+        };
+        const marks = items.map((ev, i) => {
+          const x = xOf(ev.at).toFixed(1);
+          const c = TL_COLORS[ev.type] ?? '#9aa0a8';
+          const h = ev.type === 'user' ? 14 : ev.type === 'assistant' ? 11 : 7;
+          return h('line', {
+            key: `tl${i}`,
+            x1: x, y1: axisY - h, x2: x, y2: axisY,
+            stroke: c, 'stroke-width': 2, 'stroke-linecap': 'round',
+          }, h('title', null, `${ev.type === 'tool' ? toolCn(ev.name) : ev.type === 'user' ? 'QQ 用户' : '机器人'} · ${timeOf(ev.at)}`));
+        });
+        const hourLabels = [0, 6, 12, 18, 24].map(hh => {
+          const x = pad + (hh / 24) * (W - pad * 2);
+          return h('text', { key: `h${hh}`, x, y: H - 2, 'text-anchor': hh === 0 ? 'start' : hh === 24 ? 'end' : 'middle', 'font-size': 9, fill: 'var(--qm-muted)' }, `${hh}:00`);
+        });
+        return h('svg', { className: 'qm-timeline', viewBox: `0 0 ${W} ${H}`, height: H, 'aria-label': '今日事件时间线' },
+          h('line', { x1: pad, y1: axisY, x2: W - pad, y2: axisY, stroke: 'var(--qm-line)', 'stroke-width': 1 }),
+          ...marks,
+          ...hourLabels,
+          items.length === 0 ? h('text', { x: W / 2, y: axisY - 18, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--qm-muted)' }, '今天还没有事件') : null,
+        );
+      }
+
+      /* ── 统计页（第2轮）── */
+      /** 14 天每日消息数 + 回复耗时 + 工具排行，全部由 transcript 前端聚合 */
+      function computeStats(events) {
+        const arr = (events ?? []).filter(ev => ev.type === 'user' || ev.type === 'assistant' || ev.type === 'tool');
+        const days = [];
+        const today = new Date();
+        for (let i = 13; i >= 0; i--) {
+          const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+          days.push({ key: dayKeyOf(d.getTime()), label: `${d.getMonth() + 1}/${d.getDate()}`, count: 0 });
+        }
+        const byDay = new Map(days.map(d => [d.key, d]));
+        const latencies = [];
+        let pendingUser = null;
+        const toolCount = new Map();
+        for (const ev of arr) {
+          if (ev.type === 'user') {
+            const day = byDay.get(dayKeyOf(ev.at));
+            if (day) day.count++;
+            pendingUser = ev;
+          } else if (ev.type === 'assistant') {
+            const day = byDay.get(dayKeyOf(ev.at));
+            if (day) day.count++;
+            if (pendingUser && typeof ev.at === 'number' && typeof pendingUser.at === 'number') {
+              const dt = ev.at - pendingUser.at;
+              if (dt >= 0 && dt < 10 * 60_000) latencies.push(dt);
+            }
+            pendingUser = null;
+          } else if (ev.type === 'tool') {
+            const name = ev.name ?? 'tool';
+            toolCount.set(name, (toolCount.get(name) ?? 0) + 1);
+          }
+        }
+        latencies.sort((a, b) => a - b);
+        const pick = p => latencies.length ? latencies[Math.min(latencies.length - 1, Math.floor(p * latencies.length))] : null;
+        const top = [...toolCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+        return { days, latencyMedian: pick(0.5), latencyP90: pick(0.9), latencyCount: latencies.length, top };
+      }
+
+      function fmtLatency(ms) {
+        if (ms === null || ms === undefined) return '—';
+        if (ms < 60_000) return `${(ms / 1000).toFixed(1)} 秒`;
+        return `${Math.floor(ms / 60_000)} 分 ${Math.round((ms % 60_000) / 1000)} 秒`;
+      }
+
+      /** 14 天折线（纯 SVG） */
+      function DaysChart({ days }) {
+        const W = 760;
+        const H = 120;
+        const padX = 24;
+        const padY = 14;
+        const max = Math.max(1, ...days.map(d => d.count));
+        const step = days.length > 1 ? (W - padX * 2) / (days.length - 1) : 0;
+        const yOf = v => H - padY - (v / max) * (H - padY * 2);
+        const pts = days.map((d, i) => `${(padX + i * step).toFixed(1)},${yOf(d.count).toFixed(1)}`).join(' ');
+        return h('svg', { className: 'qm-stat-chart', viewBox: `0 0 ${W} ${H}`, height: H },
+          h('polyline', { points: pts, fill: 'none', stroke: 'var(--qm-accent)', 'stroke-width': 2, 'stroke-linejoin': 'round' }),
+          ...days.map((d, i) => h('circle', { key: `p${i}`, cx: (padX + i * step).toFixed(1), cy: yOf(d.count).toFixed(1), r: 2.5, fill: 'var(--qm-accent)' },
+            h('title', null, `${d.label} · ${d.count} 条`))),
+          ...days.map((d, i) => (i % 2 === 0 || i === days.length - 1)
+            ? h('text', { key: `x${i}`, x: padX + i * step, y: H - 2, 'text-anchor': 'middle', 'font-size': 9, fill: 'var(--qm-muted)' }, d.label)
+            : null),
+        );
+      }
+
+      /** 模块卡片（第2轮【卡片注册机制】渲染端）：全部 textContent 级渲染（React 文本节点） */
+      function ModuleCard({ m }) {
+        const staleCls = m.stale ? ' stale' : m.status === 'off' ? ' off' : '';
+        return h('div', { className: `qm-mod${staleCls}` },
+          h('div', { className: 'qm-mod-top' },
+            m.icon ? h('span', { 'aria-hidden': true }, m.icon) : null,
+            h('span', { className: 'qm-mod-title' }, m.title),
+            h('span', { className: `qm-hdot ${m.status === 'ok' ? 'ok' : m.status === 'warn' ? 'warn' : m.status === 'error' ? 'stuck' : ''}` })),
+          m.headline ? h('div', { className: 'qm-mod-headline' }, m.headline) : null,
+          ...m.rows.map((r, i) => h('div', { key: `r${i}`, className: 'qm-mod-row' },
+            h('span', { className: 'qm-mod-label' }, r.label),
+            h('span', { className: 'qm-mod-value' }, r.value))),
+          m.spark && m.spark.length >= 2 ? h(Sparkline, { points: m.spark }) : null,
+          m.stale ? h('div', { className: 'qm-now-sub' }, '数据已过期') : null,
+        );
       }
 
       /* ── 主面板 ── */
@@ -652,6 +906,8 @@
         const [health, setHealth] = useState(null);
         // 本地 1 秒心跳：驱动「x 秒前」递增与倒计时判定，不依赖轮询节奏（设计稿 5）
         const [nowTick, setNowTick] = useState(() => Date.now());
+        // 注入元数据显示开关（第1轮-1）：默认隐藏
+        const [showSys, setShowSys] = useState(false);
         const scrollRef = useRef(null);
         const nearBottomRef = useRef(true);
         // 已渲染事件数：仅尾部新增的消息/工具组标记 fresh（设计稿 7 增量淡入）
@@ -780,27 +1036,35 @@
         const selected = sessions.find(s => s.sessionId === selectedId) ?? null;
         const units = toUnits(events ?? []);
         const unitCount = events?.length ?? 0;
+        const sysCount = (events ?? []).filter(ev => ev.type === 'user' && isInjectedMeta(ev.text)).length;
+        const hasSys = sysCount > 0;
         const selectedTitle = titles[selectedId] ?? selected?.title ?? (selected ? `${scopeLabel(selected.scope)} ${selected.peerLabel}` : '');
 
-        return h('div', { className: 'qm-page qm-root' },
-          // 吸顶头部（设计稿 6）
-          h('div', { className: 'qm-headbar' },
-            h('h2', null, 'QQ 监控'),
-            h('span', { className: 'qm-live' },
-              h('span', { className: 'qm-live-dot', 'aria-hidden': true }), '实时'),
-            h('span', { className: 'qm-badge' }, `${sessions.length} 个会话`),
-            h('span', { className: 'qm-head-meta', style: { fontSize: 12, color: 'var(--qm-muted)' } },
-              selectedTitle || '实时镜像本 Harness 里的 QQ 机器人对话'),
-            h('button', {
-              className: 'qm-refresh', type: 'button',
-              onClick: () => { loadSessions(); if (selectedId) loadTranscript(selectedId); },
-            }, '刷新'),
-          ),
-          error ? h('div', { className: 'qm-error' }, error) : null,
-          selectedId !== null
-            ? h(HealthBar, { health, nowTick, selectedTitle })
-            : null,
-          h('div', { className: 'qm-body' },
+        /* ── 标签页（第2轮）：可注册数组 + URL hash 记忆 ── */
+        // 后续新标签往这个数组加 { id, label, render: () => 节点 } 即可，不写死
+        const TABS = [
+          { id: 'overview', label: '总览', render: () => h(OverviewPage, { events, health, nowTick }) },
+          { id: 'chat', label: '对话', render: renderChatTab },
+          { id: 'stats', label: '统计', render: () => h(StatsPage, { events }) },
+        ];
+        const [tab, setTab] = useState(() => {
+          const h0 = typeof window !== 'undefined' && window.location?.hash?.replace(/^#/, '');
+          return TABS.some(t => t.id === h0) ? h0 : 'overview';
+        });
+        useEffect(() => {
+          try { window.history.replaceState(null, '', `#${tab}`); } catch { /* hash 只作记忆 */ }
+        }, [tab]);
+        const onHashChange = () => {
+          const h0 = window.location?.hash?.replace(/^#/, '');
+          if (TABS.some(t => t.id === h0)) setTab(h0);
+        };
+        useEffect(() => {
+          window.addEventListener('hashchange', onHashChange);
+          return () => window.removeEventListener('hashchange', onHashChange);
+        });
+
+        function renderChatTab() {
+          return h('div', { className: 'qm-body' },
             h('div', { className: 'qm-list' },
               sessions.length === 0
                 ? h('div', { className: 'qm-empty' }, '还没有 QQ 会话。', h('br'), '在 QQ 里给机器人发一条消息后，这里就会出现会话。')
@@ -816,8 +1080,7 @@
                     h('span', { className: 'qm-item-preview' },
                       s.lastText ? s.lastText.replace(/\s+/g, ' ').slice(0, 60) : `${scopeLabel(s.scope)} · ${s.peerLabel}`),
                   )),
-            ),
-            h('div', { className: 'qm-chat' },
+            ),            h('div', { className: 'qm-chat' },
               selectedId === null
                 ? h('div', { className: 'qm-empty' }, '← 从左侧选择一个会话查看实时对话')
                 : h(Fragment, null,
@@ -827,26 +1090,29 @@
                           ? h('div', { className: 'qm-empty' }, events === null ? '加载中…' : '这个会话还没有可显示的记录')
                           : units.map((u, i) => {
                               // 该渲染单元的最后一个事件在「上次渲染」之后 → fresh（设计稿 7）
-                              const lastSeqIdx = u.kind === 'tool' ? unitCount - 0 : 0;
                               const evEnd = u.kind === 'tool' ? u.group[u.group.length - 1] : u.ev;
                               const idxInEvents = events.indexOf(evEnd);
                               const fresh = idxInEvents >= 0 && idxInEvents >= renderedCountRef.current && renderedCountRef.current > 0;
-                              void lastSeqIdx;
                               const dayKey = u.kind === 'msg' ? dayKeyOf(u.ev.at) : dayKeyOf(u.group[0].at);
                               const prevUnit = i > 0 ? units[i - 1] : null;
                               const prevDay = prevUnit
-                                ? (prevUnit.kind === 'msg' ? dayKeyOf(prevUnit.ev.at) : dayKeyOf(prevUnit.group[0].at))
+                                ? (prevUnit.kind === 'msg' ? dayKeyOf(prevUnit.ev.at) : prevUnit.kind === 'tool' ? dayKeyOf(prevUnit.group[0].at) : dayKeyOf(prevUnit.group[0].at))
                                 : null;
-                              return h(Fragment, { key: u.kind === 'tool' ? `g${i}` : (u.ev.seq ?? `m${i}`) },
+                              return h(Fragment, { key: u.kind === 'tool' ? `g${i}` : u.kind === 'sysline' ? `s${i}` : (u.ev.seq ?? `m${i}`) },
                                 dayKey && dayKey !== prevDay ? h('div', { className: 'qm-day' }, h('span', null, dayLabelOf(dayKey))) : null,
                                 u.kind === 'tool'
                                   ? h(ToolRow, { group: u.group, fresh, keyBase: `g${i}` })
-                                  : h(MessageRow, {
-                                      ev: u.ev,
-                                      prev: prevUnit?.kind === 'msg' ? prevUnit.ev : null,
-                                      fresh,
-                                      keyBase: `m${i}`,
-                                    }),
+                                  : u.kind === 'sysline'
+                                    ? (showSys
+                                        ? h('div', { className: 'qm-sysline', title: u.group[0].text },
+                                            `⚙ ${u.group.length > 1 ? `${u.group.length} 条系统注入` : u.group[0].text.slice(0, 120)}`)
+                                        : null)
+                                    : h(MessageRow, {
+                                        ev: u.ev,
+                                        prev: prevUnit?.kind === 'msg' ? prevUnit.ev : null,
+                                        fresh,
+                                        keyBase: `m${i}`,
+                                      }),
                               );
                             }),
                       ),
@@ -857,8 +1123,116 @@
                           onClick: jumpToBottom,
                         }, '↓')
                       : null,
-                  )),
+                    // 注入消息开关（第1轮-1）：有被过滤内容时才显示
+                    hasSys && h('div', { className: 'qm-sysline-toggle' },
+                      h('button', {
+                        type: 'button',
+                        onClick: () => setShowSys(v => !v),
+                        'aria-pressed': showSys,
+                      }, showSys ? '隐藏系统注入消息' : `显示系统注入消息（${sysCount} 条）`)),
+                  ),
+            ),
+          );
+        }
+
+        return h('div', { className: 'qm-page qm-root' },
+          // 吸顶头部（设计稿 6）
+          h('div', { className: 'qm-headbar' },
+            h('h2', null, 'QQ 监控'),
+            h('span', { className: 'qm-live' },
+              h('span', { className: 'qm-live-dot', 'aria-hidden': true }), '实时'),
+            h('span', { className: 'qm-badge' }, `${sessions.length} 个会话`),
+            h('span', { className: 'qm-head-meta', style: { fontSize: 12, color: 'var(--qm-muted)' } },
+              selectedTitle || '实时镜像本 Harness 里的 QQ 机器人对话'),
+            h('button', {
+              className: 'qm-refresh', type: 'button',
+              onClick: () => { loadSessions(); if (selectedId) loadTranscript(selectedId); },
+            }, '刷新'),
           ),
+          // 标签栏（第2轮）
+          h('div', { className: 'qm-tabs', role: 'tablist' },
+            TABS.map(t => h('button', {
+              key: t.id,
+              type: 'button', role: 'tab',
+              className: `qm-tab${tab === t.id ? ' active' : ''}`,
+              'aria-selected': tab === t.id,
+              onClick: () => setTab(t.id),
+            }, t.label)),
+          ),
+          error ? h('div', { className: 'qm-error' }, error) : null,
+          tab === 'chat' && selectedId !== null
+            ? h(HealthBar, { health, nowTick, selectedTitle })
+            : null,
+          TABS.find(t => t.id === tab)?.render() ?? null,
+        );
+      }
+
+      /** 总览页（第2轮）：状态条 + 此刻在做什么 + 今日时间线 + 模块卡片网格 */
+      function OverviewPage({ events, health, nowTick }) {
+        const [modules, setModules] = useState(null);
+        useEffect(() => {
+          let stopped = false;
+          const load = () => {
+            fetch(ROUTE_MODULES, { cache: 'no-store' }).then(r => r.json()).then(data => {
+              if (!stopped) setModules(data.modules ?? []);
+            }).catch(() => { if (!stopped) setModules([]); });
+          };
+          load();
+          const timer = setInterval(() => {
+            if (document.visibilityState === 'visible') load();
+          }, TRANSCRIPT_POLL_MS);
+          return () => { stopped = true; clearInterval(timer); };
+        }, []);
+        const now = deriveNow(events, nowTick);
+        return h('div', { className: 'qm-chat', style: { overflowY: 'auto' } },
+          h(HealthBar, { health, nowTick, selectedTitle: '' }),
+          h('div', { className: 'qm-now' },
+            StatusFace({ level: now.level === 'busy' ? 'ok' : 'idle' }),
+            h('div', { style: { minWidth: 0 } },
+              h('div', { className: 'qm-now-doing' }, now.doing),
+              h('div', { className: 'qm-now-sub' }, now.sub || '由会话事件推导，不依赖模型自述')),
+          ),
+          h('div', { className: 'qm-timeline-wrap' },
+            h('div', { className: 'qm-timeline-title' }, '今日时间线（蓝=用户 绿=机器人 黄=工具）'),
+            h(TodayTimeline, { events })),
+          h('div', { className: 'qm-modgrid' },
+            modules === null
+              ? h('div', { className: 'qm-mod-empty' }, '加载中…')
+              : modules.length === 0
+                ? h('div', { className: 'qm-mod-empty qm-empty', style: { padding: '18px' } }, '功能上线后会出现在这里')
+                : modules.map(m => h(ModuleCard, { key: m.id, m })),
+          ),
+        );
+      }
+
+      /** 统计页（第2轮）：14 天消息折线 + 回复耗时 + 工具排行 */
+      function StatsPage({ events }) {
+        const stats = computeStats(events);
+        return h('div', { className: 'qm-stats' },
+          h('div', { className: 'qm-stat-card' },
+            h('div', { className: 'qm-stat-title' }, '近 14 天每日消息数（用户+机器人）'),
+            h(DaysChart, { days: stats.days })),
+          h('div', { className: 'qm-stat-card' },
+            h('div', { className: 'qm-stat-title' }, `回复耗时（用户 → 机器人下一条回复，样本 ${stats.latencyCount} 次）`),
+            h('div', { style: { display: 'flex', gap: 32 } },
+              h('div', null,
+                h('div', { className: 'qm-stat-num' }, fmtLatency(stats.latencyMedian)),
+                h('div', { className: 'qm-stat-sub' }, '中位数')),
+              h('div', null,
+                h('div', { className: 'qm-stat-num' }, fmtLatency(stats.latencyP90)),
+                h('div', { className: 'qm-stat-sub' }, 'P90')))),
+          h('div', { className: 'qm-stat-card' },
+            h('div', { className: 'qm-stat-title' }, '工具调用排行（前 8）'),
+            stats.top.length === 0
+              ? h('div', { className: 'qm-now-sub' }, '还没有工具调用记录')
+              : h('div', null, stats.top.map(([name, count], i) => {
+                  const max = stats.top[0][1];
+                  return h('div', { key: name, className: 'qm-rank-row' },
+                    h('span', { className: 'qm-rank-name' }, `${i + 1}. ${toolCn(name)}`),
+                    h('span', { className: 'qm-rank-bar-track' },
+                      h('span', { className: 'qm-rank-bar', style: { width: `${Math.max(4, (count / max) * 100)}%` } })),
+                    h('span', { className: 'qm-rank-count' }, String(count)));
+                }))),
         );
       }
 
